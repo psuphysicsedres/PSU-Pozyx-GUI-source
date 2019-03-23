@@ -1,4 +1,4 @@
-# PSU-Pozyx-GUI-executable
+# PSU-Pozyx-GUI-source
 A software application for interfacing with the Pozyx(R) Local Positioning
 System (LPS) device from Pozyx-Labs.
 

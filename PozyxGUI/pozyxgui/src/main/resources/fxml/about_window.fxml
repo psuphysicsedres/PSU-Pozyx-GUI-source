@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label alignment="CENTER" layoutY="2.0" maxHeight="44.0" maxWidth="247.0" minHeight="44.0" minWidth="247.0" prefHeight="44.0" prefWidth="247.0" text="Running PozyxGUI Version 0.0.7" />
+   </children>
+</AnchorPane>
