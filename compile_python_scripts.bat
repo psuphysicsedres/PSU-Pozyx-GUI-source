@@ -8,4 +8,6 @@ pyinstaller --distpath PozyxGUI/pozyxgui/src/main/resources/scripts/win 3D_posit
 
 pyinstaller --distpath PozyxGUI/pozyxgui/src/main/resources/scripts/win motion_data.py -y
 
-pyinstaller --distpath PozyxGUI/pozyxgui/src/main/resources/scripts/win configure_uwb_settings.py -ypyinstaller --distpath PozyxGUI/pozyxgui/src/main/resources/scripts/win console_printing.py -y
+pyinstaller --distpath PozyxGUI/pozyxgui/src/main/resources/scripts/win configure_uwb_settings.py -y
+
+pyinstaller --distpath PozyxGUI/pozyxgui/src/main/resources/scripts/win console_printing.py -y
