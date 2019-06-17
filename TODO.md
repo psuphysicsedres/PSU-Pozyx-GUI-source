@@ -8,8 +8,7 @@
 - Plot the (0,0) Earth tag under the Earth Center transform
   - Figuring out how to plot multiple data sets on same graph
 - MYSTERIOUSLY RESOLVED: Figure out why when Angular Earth Center transform on, and one tag accurate and other invalid, plots angle 0
-- Number of points option on graphing 2D not working
-  - Appears to have never been implemented
+- DONE: Number of points option on graphing 2D not working
 - Pathing with new script doesn't work
 
 ## Medium Term
