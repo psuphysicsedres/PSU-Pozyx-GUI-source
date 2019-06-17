@@ -10,6 +10,7 @@
 - MYSTERIOUSLY RESOLVED: Figure out why when Angular Earth Center transform on, and one tag accurate and other invalid, plots angle 0
 - DONE: Number of points option on graphing 2D not working
 - Pathing with new script doesn't work
+  - FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\physicslab-admin/Documents/PSUPozyx/Producer File/producer_file.csv'
 
 ## Medium Term
 - Research and test whether Ptolemaic Model (wrong model) gives same retrograde data
