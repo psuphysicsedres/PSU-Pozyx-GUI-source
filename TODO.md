@@ -14,6 +14,7 @@
 
 ## Medium Term
 - Research and test whether Ptolemaic Model (wrong model) gives same retrograde data
+- We commented out a line 117 os.remove(producer_name) in 1D Ranging file to fix pathing issue. Figure out how to better fix this?
 
 ## Long Term
 - Writing up math of coordinate transforms
