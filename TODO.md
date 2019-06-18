@@ -15,7 +15,7 @@
 ## Medium Term
 - Research and test whether Ptolemaic Model (wrong model) gives same retrograde data
 - We commented out a line 117 os.remove(producer_name) in 1D Ranging file to fix pathing issue. Figure out how to better fix this?
-- When closing 1D Ranging script dialogue box, get thread exceptions (when wrong tag name inputted in GUI)
+- When closing 1D Ranging script dialogue box, get thread exceptions (when wrong Device ID name inputted in GUI)
   - Exception in thread "JavaFX Application Thread" java.lang.NullPointerException
 
 ## Long Term
