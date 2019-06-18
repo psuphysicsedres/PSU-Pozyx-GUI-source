@@ -26,3 +26,4 @@
 - Adding -pi to pi ticks on the Angle transform
 - Linex and MacOSX pathing differences
 - Graphing script could start by reading the header, then skip to the end of the data file and graph
+- Put in a note for when the tag has a typo, then the header just says 0x0 and data runs but with errors
