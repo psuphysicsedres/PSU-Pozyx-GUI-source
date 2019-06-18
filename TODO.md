@@ -1,7 +1,7 @@
 # Pozyx To Do List
 
 ## Short Term
-- Look through code to find out why 2D sometimes won't run. Thinking first velocity empty or zero
+- Look through code to find out why 3D sometimes won't run. Thinking first velocity empty or zero
 - DONE: Change "center" to "earth" and "outer" to "observed" in graphing 2D
 - DONE: Plot points and lines rather than just lines
   - Ask whether want black points and colored lines when change color
