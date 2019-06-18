@@ -2,16 +2,8 @@
 
 ## Short Term
 - Look through code to find out why 3D sometimes won't run. Thinking first velocity empty or zero
-- DONE: Change "center" to "earth" and "outer" to "observed" in graphing 2D
-- DONE: Plot points and lines rather than just lines
-  - Ask whether want black points and colored lines when change color
 - Plot the (0,0) Earth tag under the Earth Center transform
   - Figuring out how to plot multiple data sets on same graph
-- MYSTERIOUSLY RESOLVED: Figure out why when Angular Earth Center transform on, and one tag accurate and other invalid, plots angle 0
-- DONE: Number of points option on graphing 2D not working
-- DONE: Pathing with new script doesn't work
-  - FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\physicslab-admin/Documents/PSUPozyx/Producer File/producer_file.csv'
-- Change "Time" to "TimeElapsed" in graphing script
 
 ## Medium Term
 - Research and test whether Ptolemaic Model (wrong model) gives same retrograde data
@@ -27,3 +19,13 @@
 - Linex and MacOSX pathing differences
 - Graphing script could start by reading the header, then skip to the end of the data file and graph
 - Put in a note for when the tag has a typo, then the header just says 0x0 and data runs but with errors
+
+## Finished Tasks
+- DONE: Change "center" to "earth" and "outer" to "observed" in graphing 2D
+- DONE: Plot points and lines rather than just lines
+  - Ask whether want black points and colored lines when change color
+  - MYSTERIOUSLY RESOLVED: Figure out why when Angular Earth Center transform on, and one tag accurate and other invalid, plots angle 0
+- DONE: Number of points option on graphing 2D not working
+- DONE: Pathing with new script doesn't work
+  - FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\physicslab-admin/Documents/PSUPozyx/Producer File/producer_file.csv'
+- DONE: Change "Time" to "TimeElapsed" in graphing script
