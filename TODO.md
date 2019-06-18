@@ -13,6 +13,7 @@
   - FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\physicslab-admin/Documents/PSUPozyx/Producer File/producer_file.csv'
 - 1D and 3D headers have different "time" names
   - Either put as global variable or in the module file_writing file
+  - Change "time" to "timeelapsed" in graphing script
 
 ## Medium Term
 - Research and test whether Ptolemaic Model (wrong model) gives same retrograde data
