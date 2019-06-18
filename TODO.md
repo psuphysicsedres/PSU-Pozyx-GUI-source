@@ -25,3 +25,4 @@
 - Writing up math of coordinate transforms
 - Adding -pi to pi ticks on the Angle transform
 - Linex and MacOSX pathing differences
+- Graphing script could start by reading the header, then skip to the end of the data file and graph
