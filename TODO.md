@@ -11,6 +11,7 @@
 - DONE: Number of points option on graphing 2D not working
 - DONE: Pathing with new script doesn't work
   - FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\physicslab-admin/Documents/PSUPozyx/Producer File/producer_file.csv'
+- 1D and 3D headers have different "time" names
 
 ## Medium Term
 - Research and test whether Ptolemaic Model (wrong model) gives same retrograde data
