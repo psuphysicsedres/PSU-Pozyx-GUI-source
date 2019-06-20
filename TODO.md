@@ -4,6 +4,7 @@
 - Look through code to find out why 3D sometimes won't run. Thinking first velocity empty or zero
 - Plot the (0,0) Earth tag under the Earth Center transform
   - Figuring out how to plot multiple data sets on same graph
+- Edited modules\messaging.py to search for string velocity, but might want to change "if" statement to '' rather than if the type is a string
 
 ## Medium Term
 - Research and test whether Ptolemaic Model (wrong model) gives same retrograde data
