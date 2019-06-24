@@ -2,6 +2,7 @@ import os
 import random
 import sys
 import time
+import numpy as np
 from socket import gethostbyname, gethostname
 
 import pyqtgraph as pg
@@ -25,9 +26,12 @@ my_local_ip_address = gethostbyname(gethostname())
 
 class DataHandler:
     def __init__(self):
-        self.tag = "0x6000"
-        self.x_axis = "Time"
+        self.x_axis = "TimeElapsed"
         self.y_axis = "Index"
+        self.transform = "None"
+        self.transform_on = False
+        self.center_tag = "0x6000"
+        self.outer_tag = "0x6000"
         self.x_data = []
         self.y_data = []
         self.export_data = []
@@ -51,16 +55,22 @@ class DataHandler:
     def clear_data(self):
         self.x_data = []
         self.y_data = []
-
-    def change_tag(self, tag_in):
-        self.tag = tag_in
-        self.to_check_tag_idx = True
-
+        
     def change_x_axis(self, x_axis_in):
         self.x_axis = x_axis_in
 
     def change_y_axis(self, y_axis_in):
         self.y_axis = y_axis_in
+
+    def change_transform(self, transform_in):
+        self.transform = transform_in
+
+    def change_center_tag(self, center_tag_in):
+        self.center_tag = center_tag_in
+
+    def change_outer_tag(self, outer_tag_in):
+        self.outer_tag = outer_tag_in
+        #self.to_check_tag_idx = True
 
     def change_max_data_len(self, len_in):
         self.maxLen = len_in
@@ -117,12 +127,12 @@ class DataHandler:
             self.y_data.append(y)
         else:
             pass
-        #number_x_over = len(self.x_data) - self.maxLen
-        #if number_x_over > 0:
-            #self.x_data = self.x_data[number_x_over:]
-        #number_y_over = len(self.y_data) - self.maxLen
-        #if number_y_over > 0:
-            #self.y_data = self.y_data[number_y_over:]
+        number_x_over = len(self.x_data) - self.maxLen
+        if number_x_over > 0:
+            self.x_data = self.x_data[number_x_over:]
+        number_y_over = len(self.y_data) - self.maxLen
+        if number_y_over > 0:
+            self.y_data = self.y_data[number_y_over:]
 
     def deal_with_data(self, new_data):
         data_array = []
@@ -140,8 +150,66 @@ class DataHandler:
 
         x = data_array[x_index]
         y = data_array[y_index]
-        self.add(x, y)
 
+
+        if self.transform == "None":       
+            self.add(x, y)
+
+        if self.transform == "Earth Center":
+            try:
+                xc_index = self.header[self.center_tag + " Measured-X"]
+                yc_index = self.header[self.center_tag + " Measured-Y"]
+                xo_index = self.header[self.outer_tag + " Measured-X"]
+                yo_index = self.header[self.outer_tag + " Measured-Y"]
+
+                xc = data_array[xc_index]
+                yc = data_array[yc_index]
+                xo = data_array[xo_index]
+                yo = data_array[yo_index]
+
+                transform_x = xo - xc
+                transform_y = yo - yc
+
+                self.add(transform_x, transform_y)
+
+            except(KeyError):
+                print("Current Earth or observed tag name invalid")
+                pass
+            
+        if self.transform == "Angle":
+                        
+            time_index = self.header["TimeElapsed"]
+            t = data_array[time_index]
+            
+            angle = np.arctan2(y,x)
+            self.add(angle,t)
+
+        if self.transform == "Angular Earth Center":
+            
+            time_index = self.header["TimeElapsed"]
+            t = data_array[time_index]
+            
+            try:
+                xc_index = self.header[self.center_tag + " Measured-X"]
+                yc_index = self.header[self.center_tag + " Measured-Y"]
+                xo_index = self.header[self.outer_tag + " Measured-X"]
+                yo_index = self.header[self.outer_tag + " Measured-Y"]
+
+                xc = data_array[xc_index]
+                yc = data_array[yc_index]
+                xo = data_array[xo_index]
+                yo = data_array[yo_index]
+
+                transform_x = xo - xc
+                transform_y = yo - yc
+
+                angle = np.arctan2(transform_y,transform_x)
+                self.add(angle,t)
+
+            except(KeyError):
+                print("Current Earth or observed tag name invalid")
+                pass
+            
     def extract_header(self, header_string):
         index = 0
         header_name = header_string.split(',')
@@ -228,6 +296,8 @@ if __name__ == "__main__":
         axis_names.append(str(key))
     possible_data_types = axis_names
 
+    possible_transform_types = ["None", "Earth Center", "Angle", "Angular Earth Center"]
+
     pg.setConfigOption('background', 'w')
     pg.setConfigOption('foreground', 'k')
     pg.setConfigOption('useOpenGL', True)
@@ -238,7 +308,7 @@ if __name__ == "__main__":
     pw = pg.PlotWidget()
 
     pw.showGrid(x=True, y=True)
-    pw.setAutoPan(x=True)
+    #pw.setAutoPan(x=True)
     #pw.setDownsampling(ds=80)
 
     w = QtGui.QWidget()
@@ -249,21 +319,36 @@ if __name__ == "__main__":
     x_label = QtGui.QLabel("X-axis:")
     x_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
     x_dropdown = pg.ComboBox(items=possible_data_types)
-    x_dropdown.setValue("Time")
+    x_dropdown.setValue("TimeElapsed")
     y_label = QtGui.QLabel("Y-axis:")
     y_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
     y_dropdown = pg.ComboBox(items=possible_data_types)
     y_dropdown.setValue("Index")
 
+    transform_label = QtGui.QLabel("Transform")
+    transform_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+    #transform_dropdown = pg.ComboBox(items=possible_transform_types)
+    transform_dropdown = QtGui.QComboBox()
+    transform_dropdown.addItems(possible_transform_types)
+    #transform_dropdown.setValue("None")
+    #transform_dropdown.setFlags(QtCore.Qt.ItemIsUserCheckable | Qt.Core.Qt.ItemIsEnabled)
+    #transform_dropdown.setCheckState(QtCore.Qt.Unchecked)
+
+    center_tag_label = QtGui.QLabel("Earth Tag:")
+    center_tag_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+    center_tag_input= QtGui.QLineEdit()
+    center_tag_input.setText("0x6000")
+    center_tag_input.setMaxLength(6)
+
     data_point_label = QtGui.QLabel("Points:")
     data_point_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
     data_point_spin = pg.SpinBox(value=100, bounds=(2, 5000), step=1.0, dec=True, int=True)
 
-    tag_label = QtGui.QLabel("Tag:")
-    tag_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-    tag_input = QtGui.QLineEdit()
-    tag_input.setText("0x6000")
-    tag_input.setMaxLength(6)
+    outer_tag_label = QtGui.QLabel("Observed Tag:")
+    outer_tag_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+    outer_tag_input = QtGui.QLineEdit()
+    outer_tag_input.setText("0x6000")
+    outer_tag_input.setMaxLength(6)
 
     clear_data_button = QtGui.QPushButton("Clear Window")
 
@@ -292,11 +377,16 @@ if __name__ == "__main__":
     layout.addWidget(clear_data_button, 1, 0, 1, 2)
     layout.addWidget(y_label,           1, 2, 1, 1)
     layout.addWidget(y_dropdown,        1, 3, 1, 2)
-    layout.addWidget(lan_data_checkbox, 1, 5, 1, 2, QtCore.Qt.AlignCenter)
-    layout.addWidget(tag_label,         1, 7, 1, 1)
-    layout.addWidget(tag_input,         1, 8, 1, 2)
+    layout.addWidget(transform_label,   1, 5, 1, 1)
+    layout.addWidget(transform_dropdown,1, 6, 1, 1)
+    layout.addWidget(lan_data_checkbox, 1, 7, 1, 2, QtCore.Qt.AlignCenter)
     # row 3
-    layout.addWidget(pw,                2, 0, 1, 10)
+    layout.addWidget(center_tag_label,    2, 5, 1, 1)
+    layout.addWidget(center_tag_input,    2, 6, 1, 1)
+    layout.addWidget(outer_tag_label,             2, 7, 1, 1)
+    layout.addWidget(outer_tag_input,             2, 8, 1, 2)
+    #row 4
+    layout.addWidget(pw,                3, 0, 1, 10)
 
     for i in range(0, 10):
         layout.setColumnStretch(i, 1)
@@ -305,7 +395,8 @@ if __name__ == "__main__":
 
     connect = []
     pen = pg.mkPen('k', width=2)
-    curve = pw.plot(connect="finite",pen=pen)
+    symbolpen = pg.mkPen('k')
+    curve = pw.plot(connect="finite", pen=pen, symbol='o', symbolPen=symbolpen)
 
     graphing_paused = False
 
@@ -331,19 +422,41 @@ if __name__ == "__main__":
         print("Change y-axis to: " + y_dropdown.value())
         data_handler.change_y_axis(y_dropdown.value())
 
+    def change_transform(ind):
+        data_handler.clear_data()
+        print("Change transform to: " + transform_dropdown.currentText())
+        data_handler.change_transform(transform_dropdown.currentText())
+        if transform_dropdown.currentText() == "None":
+            data_handler.transform_on = False
+        elif transform_dropdown.currentText() == "Angle":
+            data_handler.transform_on = False
+        else:
+            data_handler.transform_on = True
+            print("Earth tag: " + data_handler.center_tag)
+
+    def change_center_tag(item):
+        new_center_tag = center_tag_input.text()
+        try:
+            int(new_center_tag, 16)
+        except ValueError as e:
+            print(new_center_tag + " is not a valid hexadecimal tag name.")
+            return
+        print("Change Earth tag to: " + new_center_tag)
+        data_handler.change_center_tag(new_center_tag)
+
     def change_data_length(item):
         print("Change num data points to: " + str(item.value()))
         data_handler.change_max_data_len(int(item.value()))
-
-    def update_tag(item):
-        new_tag = tag_input.text()
+        
+    def change_outer_tag(item):
+        new_outer_tag = outer_tag_input.text()
         try:
-            int(new_tag, 16)
+            int(new_outer_tag, 16)
         except ValueError as e:
-            print(new_tag + " is not a valid hexadecimal tag name.")
+            print(new_outer_tag + " is not a valid hexadecimal tag name.")
             return
-        print("Change tag to: " + new_tag)
-        data_handler.change_tag(new_tag)
+        print("Change observed tag to: " + new_outer_tag)
+        data_handler.change_outer_tag(new_outer_tag)
 
     def pause_handler(ind):
         global graphing_paused
@@ -368,6 +481,7 @@ if __name__ == "__main__":
         if new_color == "Black":
             color_char = "k"
         curve.setPen(color_char, width=2)
+        curve.setSymbolPen(color_char)
     
     def export_handler(ind):
         start_value = pw.viewRange()[0][0]
@@ -412,8 +526,10 @@ if __name__ == "__main__":
 
     x_dropdown.currentIndexChanged.connect(change_x_axis)
     y_dropdown.currentIndexChanged.connect(change_y_axis)
+    transform_dropdown.currentIndexChanged.connect(change_transform)
+    center_tag_input.textEdited.connect(change_center_tag)
     data_point_spin.sigValueChanged.connect(change_data_length)
-    tag_input.textEdited.connect(update_tag)
+    outer_tag_input.textEdited.connect(change_outer_tag)
     pause_button.clicked.connect(pause_handler)
     clear_data_button.clicked.connect(clear_data_handler)
     lan_data_checkbox.clicked.connect(lan_data_handler)
