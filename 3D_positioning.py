@@ -123,9 +123,13 @@ class Positioning(object):
 
 
 def apply_ema_filter(loop_position_data_array, loop_alpha_pos, loop_alpha_vel):
+    #print("DEBUG: ema filter: enter.")
     for single_device_data in loop_position_data_array:
         # EMA filter calculations
-        if type(single_device_data.position.x) is int:
+        #print("DEBUG: ema filter: working on single_device_data")
+        #print("DEBUG: ema filter: position.x type: {}".format(type(single_device_data.position.x)))
+        if isinstance(single_device_data.position.x, int) or isinstance(single_device_data.position.x, float) :
+            #print("DEBUG: ema filter: position.x is int or float")
             old_smoothed_x, old_smoothed_y, old_smoothed_z = (
                 single_device_data.smoothed_x, single_device_data.smoothed_y, single_device_data.smoothed_z)
 
@@ -151,11 +155,13 @@ def apply_ema_filter(loop_position_data_array, loop_alpha_pos, loop_alpha_vel):
                 measured_velocity_y = (new_smoothed_y - old_smoothed_y) / time_difference
                 measured_velocity_z = (new_smoothed_z - old_smoothed_z) / time_difference
                 if not smooth_velocity:
+                    #print("DEBUG: ema filter: smooth velocity disabled")
                     single_device_data.velocity_x = measured_velocity_x
                     single_device_data.velocity_y = measured_velocity_y
                     single_device_data.velocity_z = measured_velocity_z
                     continue
                 # smooth velocity
+                #print("DEBUG: ema filter: smoothing velocity")
                 single_device_data.velocity_x = (
                     (1 - loop_alpha_vel) * single_device_data.velocity_x
                     + loop_alpha_vel * measured_velocity_x)
