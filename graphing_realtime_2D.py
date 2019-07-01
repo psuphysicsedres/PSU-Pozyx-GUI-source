@@ -42,8 +42,8 @@ class DataHandler:
             self.consumer = udp.Consumer()
         else:
             self.consumer = MmapCommunication()
-        self.tag_idx = 1
-        self.to_check_tag_idx = False
+        #self.tag_idx = 1
+        #self.to_check_tag_idx = False
 
     def set_use_lan_data(self, new_value):
         self.use_lan_data = new_value
