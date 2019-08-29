@@ -29,11 +29,11 @@ class DataHandler:
         self.x_axis = "TimeElapsed"
         self.y_axis = "Index"
         self.transform = "None"
-        self.transform_on = False
         self.center_tag = "0x6000"
         self.outer_tag = "0x6000"
         self.x_data = []
         self.y_data = []
+        self.origin = [0,0,0]
         self.export_data = []
         self.header = {}
         self.maxLen = max_data_length
@@ -72,6 +72,9 @@ class DataHandler:
         self.outer_tag = outer_tag_in
         #self.to_check_tag_idx = True
 
+    def change_origin(self, origin_in):
+        self.origin = origin_in
+
     def change_max_data_len(self, len_in):
         self.maxLen = len_in
 
@@ -109,7 +112,7 @@ class DataHandler:
                 float_data = float(i)
                 data_array.append(float_data)
             self.export_data.append(data_array)
-            print(data_array)
+            #print(data_array) #DEBUG
 
             x_index = header[self.x_axis]
             y_index = header[self.y_axis]
@@ -143,72 +146,126 @@ class DataHandler:
             else:
                 break
         self.export_data.append(data_array)
-        #print(data_array)
+        #print(data_array) #DEBUG
 
-        x_index = self.header[self.x_axis]
-        y_index = self.header[self.y_axis]
+        #Filter out data where the number of ranges is lower than 4
+        num_ranges = [4]
+        take_data = True
+        for i in np.arange(len(self.header)):
+            header = list(self.header)[i]
+            split_header = header.split(' ')
+            if len(split_header) == 2:
+                if split_header[1] == "Num-of-Ranges":
+                    num_ranges = np.append(num_ranges, data_array[i])
 
-        x = data_array[x_index]
-        y = data_array[y_index]
+        #print(num_ranges) #DEBUG
 
+        for num in num_ranges:
+           if num < 4:
+                take_data = False
 
-        if self.transform == "None":       
-            self.add(x, y)
+        if take_data == True:
 
-        if self.transform == "Earth Center":
-            try:
-                xc_index = self.header[self.center_tag + " Measured-X"]
-                yc_index = self.header[self.center_tag + " Measured-Y"]
-                xo_index = self.header[self.outer_tag + " Measured-X"]
-                yo_index = self.header[self.outer_tag + " Measured-Y"]
+            x_index = self.header[self.x_axis]
+            y_index = self.header[self.y_axis]
 
-                xc = data_array[xc_index]
-                yc = data_array[yc_index]
-                xo = data_array[xo_index]
-                yo = data_array[yo_index]
+            x = data_array[x_index]
+            y = data_array[y_index]
 
-                transform_x = xo - xc
-                transform_y = yo - yc
+            if self.transform == "None":
+                self.add(x, y)
 
-                self.add(transform_x, transform_y)
+            if self.transform == "Change Origin":
+                try:
+                    origin_coords = self.origin
+                    ox = int(origin_coords[0])
+                    oy = int(origin_coords[1])
+                    new_x = x - ox
+                    new_y = y - oy
+                    self.add(new_x, new_y)
 
-            except(KeyError):
-                print("Current Earth or observed tag name invalid")
-                pass
+                except (KeyError):
+                    print("Current origin input invalid")
+                    pass
+                except (IndexError):
+                    print("Current origin input invalid")
+                    pass
+
+            if self.transform == "Angle with Changed Origin":
+                try:
+                    origin_coords = self.origin
+                    ox = int(origin_coords[0])
+                    oy = int(origin_coords[1])
+                    new_x = x - ox
+                    new_y = y - oy
+
+                    time_index = self.header["TimeElapsed"]
+                    t = data_array[time_index]
             
-        if self.transform == "Angle":
-                        
-            time_index = self.header["TimeElapsed"]
-            t = data_array[time_index]
+                    angle = np.arctan2(new_y,new_x)
+                    self.add(angle,t)
+
+                except(KeyError):
+                    print("Current origin input invalid")
+                    pass
+                except (IndexError):
+                    print("Current origin input invalid")
+                    pass
             
-            angle = np.arctan2(y,x)
-            self.add(angle,t)
+            if self.transform == "Earth Center":
+                try:
+                    xc_index = self.header[self.center_tag + " Measured-X"]
+                    yc_index = self.header[self.center_tag + " Measured-Y"]
+                    xo_index = self.header[self.outer_tag + " Measured-X"]
+                    yo_index = self.header[self.outer_tag + " Measured-Y"]
 
-        if self.transform == "Angular Earth Center":
-            
-            time_index = self.header["TimeElapsed"]
-            t = data_array[time_index]
-            
-            try:
-                xc_index = self.header[self.center_tag + " Measured-X"]
-                yc_index = self.header[self.center_tag + " Measured-Y"]
-                xo_index = self.header[self.outer_tag + " Measured-X"]
-                yo_index = self.header[self.outer_tag + " Measured-Y"]
+                    xc = data_array[xc_index]
+                    yc = data_array[yc_index]
+                    xo = data_array[xo_index]
+                    yo = data_array[yo_index]
 
-                xc = data_array[xc_index]
-                yc = data_array[yc_index]
-                xo = data_array[xo_index]
-                yo = data_array[yo_index]
+                    transform_x = xo - xc
+                    transform_y = yo - yc
 
-                transform_x = xo - xc
-                transform_y = yo - yc
+                    self.add(transform_x, transform_y)
 
-                angle = np.arctan2(transform_y,transform_x)
+                except(KeyError):
+                    print("Current Earth or observed tag name invalid")
+                    pass
+
+            if self.transform == "Angle":
+
+                time_index = self.header["TimeElapsed"]
+                t = data_array[time_index]
+
+                angle = np.arctan2(y,x)
                 self.add(angle,t)
 
-            except(KeyError):
-                print("Current Earth or observed tag name invalid")
-                pass
+            if self.transform == "Angular Earth Center":
+
+                time_index = self.header["TimeElapsed"]
+                t = data_array[time_index]
+
+                try:
+                    xc_index = self.header[self.center_tag + " Measured-X"]
+                    yc_index = self.header[self.center_tag + " Measured-Y"]
+                    xo_index = self.header[self.outer_tag + " Measured-X"]
+                    yo_index = self.header[self.outer_tag + " Measured-Y"]
+
+                    xc = data_array[xc_index]
+                    yc = data_array[yc_index]
+                    xo = data_array[xo_index]
+                    yo = data_array[yo_index]
+
+                    transform_x = xo - xc
+                    transform_y = yo - yc
+
+                    angle = np.arctan2(transform_y,transform_x)
+                    self.add(angle,t)
+
+                except(KeyError):
+                    print("Current Earth or observed tag name invalid")
+                    pass
             
     def extract_header(self, header_string):
         index = 0
@@ -216,7 +273,7 @@ class DataHandler:
         for entry in header_name:
             self.header[entry] = index
             index += 1
-        print(self.header)
+        #print(self.header) #DEBUG
 
     def start_running(self, *args):
         #config = Configuration.get_properties()
@@ -296,7 +353,7 @@ if __name__ == "__main__":
         axis_names.append(str(key))
     possible_data_types = axis_names
 
-    possible_transform_types = ["None", "Earth Center", "Angle", "Angular Earth Center"]
+    possible_transform_types = ["None", "Change Origin", "Angle with Changed Origin", "Earth Center", "Angle", "Angular Earth Center"]
 
     pg.setConfigOption('background', 'w')
     pg.setConfigOption('foreground', 'k')
@@ -350,6 +407,11 @@ if __name__ == "__main__":
     outer_tag_input.setText("0x6000")
     outer_tag_input.setMaxLength(6)
 
+    origin_label = QtGui.QLabel("Origin (X,Y,Z):")
+    origin_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+    origin_input = QtGui.QLineEdit()
+    origin_input.setText("0,0,0")
+
     clear_data_button = QtGui.QPushButton("Clear Window")
 
     color_label = QtGui.QLabel("Color:")
@@ -381,10 +443,12 @@ if __name__ == "__main__":
     layout.addWidget(transform_dropdown,1, 6, 1, 1)
     layout.addWidget(lan_data_checkbox, 1, 7, 1, 2, QtCore.Qt.AlignCenter)
     # row 3
-    layout.addWidget(center_tag_label,    2, 5, 1, 1)
-    layout.addWidget(center_tag_input,    2, 6, 1, 1)
-    layout.addWidget(outer_tag_label,             2, 7, 1, 1)
-    layout.addWidget(outer_tag_input,             2, 8, 1, 2)
+    layout.addWidget(center_tag_label,  2, 2, 1, 1)
+    layout.addWidget(center_tag_input,  2, 3, 1, 2)
+    layout.addWidget(outer_tag_label,   2, 5, 1, 1)
+    layout.addWidget(outer_tag_input,   2, 6, 1, 1)
+    layout.addWidget(origin_label,      2, 7, 1, 1)
+    layout.addWidget(origin_input,      2, 8, 1, 2)
     #row 4
     layout.addWidget(pw,                3, 0, 1, 10)
 
@@ -426,12 +490,9 @@ if __name__ == "__main__":
         data_handler.clear_data()
         print("Change transform to: " + transform_dropdown.currentText())
         data_handler.change_transform(transform_dropdown.currentText())
-        if transform_dropdown.currentText() == "None":
-            data_handler.transform_on = False
-        elif transform_dropdown.currentText() == "Angle":
-            data_handler.transform_on = False
-        else:
-            data_handler.transform_on = True
+        if transform_dropdown.currentText() == "Earth Center":
+            print("Earth tag: " + data_handler.center_tag)
+        elif transform_dropdown.currentText() == "Angular Earth Center":
             print("Earth tag: " + data_handler.center_tag)
 
     def change_center_tag(item):
@@ -457,6 +518,14 @@ if __name__ == "__main__":
             return
         print("Change observed tag to: " + new_outer_tag)
         data_handler.change_outer_tag(new_outer_tag)
+
+    def change_origin(item):
+        if data_handler.transform == "Change Origin":
+            data_handler.clear_data()
+        new_origin = origin_input.text()
+        print("Change origin to: " + new_origin)
+        new_origin = new_origin.split(',')
+        data_handler.change_origin(new_origin)
 
     def pause_handler(ind):
         global graphing_paused
@@ -500,10 +569,10 @@ if __name__ == "__main__":
 
         for idx, data_array in enumerate(data):
             value = data_array[header_index]
-            print(value)
+            #print(value) #DEBUG
             if value > end_value or value == end_value:
                 ending_index = int(data_array[0])
-                print("got max x = " + str(ending_index))
+                #print("got max x = " + str(ending_index)) #DEBUG
                 break
                 
 
@@ -530,6 +599,7 @@ if __name__ == "__main__":
     center_tag_input.textEdited.connect(change_center_tag)
     data_point_spin.sigValueChanged.connect(change_data_length)
     outer_tag_input.textEdited.connect(change_outer_tag)
+    origin_input.textEdited.connect(change_origin)
     pause_button.clicked.connect(pause_handler)
     clear_data_button.clicked.connect(clear_data_handler)
     lan_data_checkbox.clicked.connect(lan_data_handler)
