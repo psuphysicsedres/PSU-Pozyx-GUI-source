@@ -210,7 +210,7 @@ if __name__ == "__main__":
     producer_name = filepath + "producer_file.csv"
     if os.path.exists(producer_name): #Kaela edit June 20
         os.remove(producer_name)  # remove old file so the program won't have to overwrite the old file which will slow it down
-    producer_write = open(producer_name, 'w')
+    producer_write = open(producer_name, 'w', buffering=1)
     FileIO.write_position_headers_to_file(producer_write, tags, attributes_to_log)
 
     pozyx = PozyxSerial(serial_port)
