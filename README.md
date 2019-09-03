@@ -12,7 +12,7 @@ The licence is included with this software in the file `license.md`.
 - Python 3.x
 - pypozyx Python Library
 - MAVEN build system
-- Java SDK
+- Java SDK (verison 8)
 - PyInstaller
 - Inno Setup (for creating Windows(R) Installer)
 
