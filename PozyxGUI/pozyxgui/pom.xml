@@ -4,7 +4,7 @@
     <groupId>com.psupozyx.app</groupId>
     <artifactId>pozyxgui</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.7</version>
+    <version>0.0.9</version>
     <name>pozyxgui</name>
     <url>http://maven.apache.org</url>
     <organization>
