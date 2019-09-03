@@ -65,6 +65,7 @@ class MotionDataFileWriting:
                 header += (hex(tag) + " Gravity-Z,")
         header += "\n"
         file.write(header)
+        file.flush()
 
     @staticmethod
     def write_line_of_data_to_file(file, index, current_time, elapsed_time, time_difference, loop_output_array, attributes_to_log):
@@ -108,6 +109,7 @@ class MotionDataFileWriting:
                 output += (str(motion.gravity_vector.z) + ",")
         output += "\n"
         file.write(output)
+        file.flush()
 
 
 class RangingFileWriting:
@@ -153,6 +155,7 @@ class RangingFileWriting:
             header += hex(tag) + " Num-of-Error,"
         header += "\n"
         file.write(header)
+        file.flush()
 
     @staticmethod
     def write_range_data_to_file(file, index, current_time, elapsed_time, time_difference, loop_output_array, attributes_to_log):
@@ -204,6 +207,7 @@ class RangingFileWriting:
             output += (str(single_output.num_of_error) + ",")
         output += "\n"
         file.write(output)
+        file.flush()
 
 
 class PositioningFileWriting:
@@ -255,6 +259,7 @@ class PositioningFileWriting:
             header += hex(tag) + " Num-of-Ranges,"       
         header += "\n"
         file.write(header)
+        file.flush()
 
     @staticmethod
     def write_position_data_to_file(file, index, current_time, elapsed_time, time_difference, loop_output_array, attributes_to_log):
@@ -312,6 +317,7 @@ class PositioningFileWriting:
             output += str(single_output.num_of_ranges) + ","
         output += "\n"
         file.write(output)
+        file.flush()
 
 
 

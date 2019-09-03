@@ -23,9 +23,19 @@ class MessageBuilder():
         pos_y = data_for_tag.smoothed_y
         pos_z = data_for_tag.smoothed_z
 
-        vel_x = data_for_tag.velocity_x
-        vel_y = data_for_tag.velocity_y
-        vel_z = data_for_tag.velocity_z
+        #Kaela edit Jun 20th:
+        if type(data_for_tag.velocity_x) == str:
+            vel_x = 0.0
+        else:
+            vel_x = data_for_tag.velocity_x
+        if type(data_for_tag.velocity_y) == str:
+            vel_y = 0.0
+        else:
+            vel_y = data_for_tag.velocity_y
+        if type(data_for_tag.velocity_z) == str:
+            vel_z = 0.0
+        else:
+            vel_z = data_for_tag.velocity_z
 
         return [pos_x, pos_y, pos_z, vel_x, vel_y, vel_z]
 

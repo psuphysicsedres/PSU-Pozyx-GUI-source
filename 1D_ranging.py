@@ -117,7 +117,8 @@ if __name__ == "__main__":
     
     filepath = os.path.expanduser('~') + "/Documents/PSUPozyx/Producer File/"
     producer_name = filepath + "producer_file.csv"
-    os.remove(producer_name)   # remove old file so the program won't have to overwrite the old file which will slow it down
+    if os.path.exists(producer_name): #Kaela edit Jun 20
+        os.remove(producer_name)   # remove old file so the program won't have to overwrite the old file which will slow it down
     producer_write = open(producer_name, 'w', 1)
     FileIO.write_range_headers_to_file(producer_write, tags, attributes_to_log)
 
